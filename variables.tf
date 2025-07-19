@@ -7,6 +7,7 @@
 variable "ct_management_account_id" {
   description = "Control Tower Management Account Id"
   type        = string
+  default = ""
   validation {
     condition     = can(regex("^\\d{12}$", var.ct_management_account_id))
     error_message = "Variable var: ct_management_account_id is not valid."
@@ -15,6 +16,7 @@ variable "ct_management_account_id" {
 variable "log_archive_account_id" {
   description = "Log Archive Account Id"
   type        = string
+  default = ""
   validation {
     condition     = can(regex("^\\d{12}$", var.log_archive_account_id))
     error_message = "Variable var: log_archive_account_id is not valid."
@@ -23,6 +25,7 @@ variable "log_archive_account_id" {
 variable "audit_account_id" {
   description = "Audit Account Id"
   type        = string
+  default = ""
   validation {
     condition     = can(regex("^\\d{12}$", var.audit_account_id))
     error_message = "Variable var: audit_account_id is not valid."
@@ -35,7 +38,7 @@ variable "audit_account_id" {
 
 variable "aft_framework_repo_url" {
   description = "Git repo URL where the AFT framework should be sourced from"
-  default     = "https://github.com/aws-ia/terraform-aws-control_tower_account_factory.git"
+  default     = "https://github.com/Onyeneke-AC/terraform-aws-control_tower_account_factory.git"
   type        = string
   validation {
     condition     = length(var.aft_framework_repo_url) > 0
@@ -45,13 +48,14 @@ variable "aft_framework_repo_url" {
 
 variable "aft_framework_repo_git_ref" {
   description = "Git branch from which the AFT framework should be sourced from"
-  default     = null
+  default     = "main"
   type        = string
 }
 
 variable "aft_management_account_id" {
   description = "AFT Management Account ID"
   type        = string
+  default     = ""
   validation {
     condition     = can(regex("^\\d{12}$", var.aft_management_account_id))
     error_message = "Variable var: aft_management_account_id is not valid."
@@ -61,6 +65,7 @@ variable "aft_management_account_id" {
 variable "ct_home_region" {
   description = "The region from which this module will be executed. This MUST be the same region as Control Tower is deployed."
   type        = string
+  default     = ""
   validation {
     condition     = can(regex("(us(-gov)?|ap|ca|cn|eu|sa|me|af|il)-(central|(north|south)?(east|west)?)-\\d", var.ct_home_region))
     error_message = "Variable var: region is not valid."
@@ -80,7 +85,7 @@ variable "cloudwatch_log_group_retention" {
 variable "backup_recovery_point_retention" {
   description = "Number of days to keep backup recovery points in AFT DynamoDB tables. Default = Never Expire"
   type        = number
-  default     = null
+  default     = 30
   validation {
     condition     = var.backup_recovery_point_retention == null ? true : (var.backup_recovery_point_retention >= 1 && var.backup_recovery_point_retention <= 36500)
     error_message = "Value must be between 1 and 36500."
@@ -152,7 +157,12 @@ variable "global_codebuild_timeout" {
 variable "tags" {
   description = "Map of tags to apply to resources deployed by AFT."
   type        = map(any)
-  default     = null
+  default     = {
+    "ManagedBy" = "AFT",
+    "Project"   = "AFT",
+    "Owner" = "Onyeneke-AC",
+    "Environment" = "Dev"
+  }
 }
 
 #########################################
@@ -168,6 +178,7 @@ variable "aft_feature_cloudtrail_data_events" {
     error_message = "Valid values for var: aft_feature_cloudtrail_data_events are (true, false)."
   }
 }
+
 variable "aft_feature_enterprise_support" {
   description = "Feature flag toggling Enterprise Support enrollment on/off"
   type        = bool
@@ -181,7 +192,7 @@ variable "aft_feature_enterprise_support" {
 variable "aft_feature_delete_default_vpcs_enabled" {
   description = "Feature flag toggling deletion of default VPCs on/off"
   type        = bool
-  default     = false
+  default     = true
   validation {
     condition     = contains([true, false], var.aft_feature_delete_default_vpcs_enabled)
     error_message = "Valid values for var: aft_feature_delete_default_vpcs_enabled are (true, false)."
@@ -196,7 +207,7 @@ variable "aft_feature_delete_default_vpcs_enabled" {
 variable "vcs_provider" {
   description = "Customer VCS Provider - valid inputs are codecommit, bitbucket, github, githubenterprise, gitlab, or gitLab self-managed"
   type        = string
-  default     = "codecommit"
+  default     = "github"
   validation {
     condition     = contains(["codecommit", "bitbucket", "github", "githubenterprise", "gitlab", "gitlabselfmanaged"], var.vcs_provider)
     error_message = "Valid values for var: vcs_provider are (codecommit, bitbucket, github, githubenterprise, gitlab, gitlabselfmanaged)."
@@ -216,7 +227,7 @@ variable "gitlab_selfmanaged_url" {
 variable "account_request_repo_name" {
   description = "Repository name for the account request files. For non-CodeCommit repos, name should be in the format of Org/Repo"
   type        = string
-  default     = "aft-account-request"
+  default     = "Onyeneke-AC/aft-account-request"
   validation {
     condition     = length(var.account_request_repo_name) > 0
     error_message = "Variable var: account_request_repo_name cannot be empty."
@@ -236,7 +247,7 @@ variable "account_request_repo_branch" {
 variable "global_customizations_repo_name" {
   description = "Repository name for the global customization files. For non-CodeCommit repos, name should be in the format of Org/Repo"
   type        = string
-  default     = "aft-global-customizations"
+  default     = "Onyeneke-AC/aft-global-customizations"
   validation {
     condition     = length(var.global_customizations_repo_name) > 0
     error_message = "Variable var: global_customizations_repo_name cannot be empty."
@@ -256,7 +267,7 @@ variable "global_customizations_repo_branch" {
 variable "account_customizations_repo_name" {
   description = "Repository name for the account customizations files. For non-CodeCommit repos, name should be in the format of Org/Repo"
   type        = string
-  default     = "aft-account-customizations"
+  default     = "Onyeneke-AC/aft-account-customizations"
   validation {
     condition     = length(var.account_customizations_repo_name) > 0
     error_message = "Variable var: account_customizations_repo_name cannot be empty."
@@ -276,7 +287,7 @@ variable "account_customizations_repo_branch" {
 variable "account_provisioning_customizations_repo_name" {
   description = "Repository name for the account provisioning customizations files. For non-CodeCommit repos, name should be in the format of Org/Repo"
   type        = string
-  default     = "aft-account-provisioning-customizations"
+  default     = "Onyeneke-AC/aft-account-provisioning-customizations"
   validation {
     condition     = length(var.account_provisioning_customizations_repo_name) > 0
     error_message = "Variable var: account_provisioning_customizations_repo_name cannot be empty."
@@ -324,48 +335,6 @@ variable "tf_backend_secondary_region" {
   validation {
     condition     = var.tf_backend_secondary_region == "" || can(regex("(us(-gov)?|ap|ca|cn|eu|sa|me|af)-(central|(north|south)?(east|west)?)-\\d", var.tf_backend_secondary_region))
     error_message = "Variable var: tf_backend_secondary_region is not valid."
-  }
-}
-
-# Non-OSS Variables
-variable "terraform_token" {
-  type        = string
-  description = "Terraform token for Cloud or Enterprise"
-  default     = "null" # Non-sensitive default value #tfsec:ignore:general-secrets-no-plaintext-exposure
-  sensitive   = true
-  validation {
-    condition     = length(var.terraform_token) > 0
-    error_message = "Variable var: terraform_token cannot be empty."
-  }
-}
-
-variable "terraform_org_name" {
-  type        = string
-  description = "Organization name for Terraform Cloud or Enterprise"
-  default     = "null"
-  validation {
-    condition     = length(var.terraform_org_name) > 0
-    error_message = "Variable var: terraform_org_name cannot be empty."
-  }
-}
-
-variable "terraform_project_name" {
-  type        = string
-  description = "Project name for Terraform Cloud or Enterprise - project must exist before deployment"
-  default     = "Default Project"
-  validation {
-    condition     = length(var.terraform_project_name) > 0
-    error_message = "Variable var: terraform_project_name cannot be empty."
-  }
-}
-
-variable "terraform_api_endpoint" {
-  description = "API Endpoint for Terraform. Must be in the format of https://xxx.xxx."
-  type        = string
-  default     = "https://app.terraform.io/api/v2/"
-  validation {
-    condition     = length(var.terraform_api_endpoint) > 0
-    error_message = "Variable var: terraform_api_endpoint cannot be empty."
   }
 }
 
